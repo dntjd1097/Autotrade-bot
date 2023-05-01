@@ -88,13 +88,13 @@ def get_balances_coin():
 # 로그인
 upbit = pyupbit.Upbit(access, secret)
 print("autotrade start")
-# 시작 메세지 슬랙 전송
-# now = datetime.now()
-# post_message(
-#     myToken,
-#     "#coin",
-#     "현재시간 : " + str(now) + "\n프로그램시작\n\n==================================",
-# )
+"""시작 메세지 슬랙 전송"""
+now = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M:%S")
+post_message(
+    myToken,
+    "#coin",
+    "현재시간 : " + str(now) + "\n프로그램시작\n\n==================================",
+)
 
 
 while True:
