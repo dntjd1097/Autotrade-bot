@@ -24,7 +24,8 @@ jobs:
       shell: bash
       run: |
         kill -9 $(ps -ef | grep Autotrade.py | awk '{print $2}')
-       
+      env:
+        CI: "" 
     - name : print log
       run: |
         cd ~/wooseong/Autotrade-bot
