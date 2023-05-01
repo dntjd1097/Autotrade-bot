@@ -22,7 +22,8 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Restart python
       run: |
-        sh clear.sh
+        ls -la
+        sudo clear.sh
         nohup python3 Autotrade.py &  > upbit.log 
         
     - name : print log
