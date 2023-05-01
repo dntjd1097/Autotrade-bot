@@ -1,11 +1,9 @@
-from lzma import CHECK_CRC64
-from pickle import TRUE
 import time
 import pyupbit
-import datetime
+from datetime import datetime, timedelta, timezone
 import requests
-import numpy as np
 from config import *
+from backlog import *
 
 
 def post_message(token, channel, text):
@@ -17,101 +15,98 @@ def post_message(token, channel, text):
     )
 
 
-def get_start_time(ticker):
-    """시작 시간 조회"""
-    df = pyupbit.get_ohlcv(ticker, interval="day", count=1)
-    start_time = df.index[0]
-    return start_time
-
-
-def get_current_price(ticker):
-    """현재가 조회"""
-    return pyupbit.get_orderbook(ticker=ticker)["orderbook_units"][0]["ask_price"]
-
-
 def get_balance():
-    now = datetime.datetime.now()
+    now = datetime.now()
     # post_message(myToken, "#coin_balance", "현재시간 : " + str(now) + "\n")
     """잔고 조회"""
     balances = upbit.get_balances()
     # print(balances)
-    global krw, BTC_balance, BTC_current, avg_buy_price, BTC_avg_buy_price
+    global krw, BTC_balance, BTC_current, avg_buy_price, BTC_avg_buy_price, count
     BTC_balance = 0
 
     for b in balances:
         if b["currency"] is not None:
-            ticker = b["currency"]
+            a_ticker = b["currency"]
             count = float(b["balance"])  # 보유 수량
-            if ticker == "KRW":
+            if a_ticker == "KRW":
                 krw = count
                 count = int(count)
-                post_message(
-                    myToken,
-                    "#coin_balance",
-                    "\n[" + "보유현금 : " + format(count, ",") + ticker + "]",
-                )
 
             else:
                 avg_buy_price = int(float(b["avg_buy_price"]))  # 매수 평균가
-                symbol = str("KRW-" + ticker)
+                symbol = str("KRW-" + a_ticker)
                 current_price = int(get_current_price(symbol))
                 total_price = int(current_price * count)  # 평가금액
                 sum = int(avg_buy_price * count)  # 매수금액
                 profit = round(((total_price - sum) / sum) * 100, 2)  # 수익률
                 diff = int((current_price - avg_buy_price) * count)  # 평가손익
-                if ticker == "BTC":
+                if a_ticker == "BTC":
                     BTC_avg_buy_price = avg_buy_price
                     BTC_balance = count
                     BTC_current = current_price
-                post_message(
-                    myToken,
-                    "#coin_balance",
-                    "\n["
-                    + ticker
-                    + "]"
-                    + "\n평가손익"
-                    + str(diff)
-                    + "    수익률 :"
-                    + str(profit)
-                    + " %"
-                    + "\n보유수량 : "
-                    + str(count)
-                    + " "
-                    + str(ticker)
-                    + "     \n매수평균가 : "
-                    + format(avg_buy_price, ",")
-                    + " KRW"
-                    + "\n평가금액 : "
-                    + format(total_price, ",")
-                    + " KRW"
-                    + "     \n매수금액 :"
-                    + format(sum, ",")
-                    + " KRW",
-                )
-    post_message(myToken, "#coin_balance", "\n==================================")
+
     return 0
+
+
+def get_balances_krw():
+    post_message(
+        myToken,
+        "#coin_balance",
+        "\n[" + "보유현금 : " + format(count, ",") + "KRW]",
+    )
+
+
+def get_balances_coin():
+    post_message(
+        myToken,
+        "#coin_balance",
+        "\n["
+        + a_ticker
+        + "]"
+        + "\n평가손익"
+        + str(diff)
+        + "    수익률 :"
+        + str(profit)
+        + " %"
+        + "\n보유수량 : "
+        + str(count)
+        + " "
+        + str(a_ticker)
+        + "     \n매수평균가 : "
+        + format(avg_buy_price, ",")
+        + " KRW"
+        + "\n평가금액 : "
+        + format(total_price, ",")
+        + " KRW"
+        + "     \n매수금액 :"
+        + format(sum, ",")
+        + " KRW",
+    )
+    post_message(myToken, "#coin_balance", "\n==================================")
 
 
 # 로그인
 upbit = pyupbit.Upbit(access, secret)
 print("autotrade start")
 # 시작 메세지 슬랙 전송
-now = datetime.datetime.now()
-post_message(
-    myToken,
-    "#coin",
-    "현재시간 : " + str(now) + "\n프로그램시작\n\n==================================",
-)
+# now = datetime.now()
+# post_message(
+#     myToken,
+#     "#coin",
+#     "현재시간 : " + str(now) + "\n프로그램시작\n\n==================================",
+# )
 
 
 while True:
     try:
-        now = datetime.datetime.now()
+        now = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M:%S")
+        now = datetime.strptime(now, "%Y-%m-%d %H:%M:%S")
+
         start_time = get_start_time("KRW-BTC")
-        end_time = start_time + datetime.timedelta(days=1)
-        get_balance()
-        current_price = get_current_price("KRW-BTC")
-        if start_time < now < end_time - datetime.timedelta(seconds=60):
+        end_time = start_time + timedelta(seconds=120)
+
+        if start_time < now < end_time:
+            current_price = get_current_price("KRW-BTC")
             ma1 = get_moving_average(ticker, 1)
             ma15 = get_moving_average(ticker, 15)
             ma20 = get_moving_average(ticker, 20)
@@ -172,7 +167,7 @@ while True:
             #     + "  ]",
             # )
 
-            if min_target_price:  # and check2:
+            if check_buy:  # and check2:
                 if krw > 5000:
                     post_message(
                         myToken,
@@ -183,9 +178,10 @@ while True:
                     post_message(
                         myToken, "#coin", "\n" + coin + " buy : " + str(buy_result)
                     )
+                    get_balances_coin()
 
             if BTC_balance > 0.00008:
-                if max_target_price:
+                if check_sell:
                     fee = BTC_avg_buy_price / (1 + comission)
                     if fee < current_price:
                         sell_result = upbit.sell_market_order(ticker, BTC_balance)
@@ -204,15 +200,16 @@ while True:
                             + "krw ]"
                             + "\n==================================",
                         )
+                        get_balances_krw()
             # elif fee < current_price:
             #    post_message(myToken,"#coin_test",
             #    "매도 X : required(" +str(current_price-fee)+
             #    " ▲ )"
             #    )
-        post_message(myToken, "#coin_test", "\n==================================")
+
         time.sleep(1)
     except Exception as e:
         print(e)
-        post_message(myToken, "#coin_error", e)
+        # post_message(myToken, "#coin_error", e)
         time.sleep(1)
-get_balance()
+# get_balance()
