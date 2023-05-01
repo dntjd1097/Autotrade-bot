@@ -23,12 +23,9 @@ jobs:
     - name: Restart python
       shell: bash
       run: |
-        kill -9 $(ps -ef | grep Autotrade.py | awk '{print $2}')
-      env:
-        CI: "" 
+        sh clear.sh
+        nohup python3 Autotrade.py &  > upbit.log 
+        
     - name : print log
       run: |
-        cd ~/wooseong/Autotrade-bot
-        nohup python3 Autotrade.py &  > upbit.log 
-        cd ~/wooseong/Autotrade-bot
         cat upbit.log
