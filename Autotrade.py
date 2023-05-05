@@ -121,7 +121,24 @@ while True:
             max_target_price = max(data)
             check_buy = currnet_price < min_target_price
             check_sell = current_price > max_target_price
-
+            post_message(
+                myToken,
+                "#coin",
+                "*"
+                + coin
+                + "*\n *현재가* : "
+                + str(current_price)
+                + "\n 구매해야됨 :"
+                + str(check_buy)
+                + " ["
+                + str(min_target_price)
+                + "]"
+                + "\n 판매해야됨 :"
+                + str(check_sell)
+                + " ["
+                + str(max_target_price)
+                + "]",
+            )
             # check1 = target_price > current_price
             # check2 = ma15 > current_price
             # check3 = "X"
@@ -207,7 +224,7 @@ while True:
             #    " ▲ )"
             #    )
 
-        time.sleep(1)
+        time.sleep(120)
     except Exception as e:
         print(e)
         # post_message(myToken, "#coin_error", e)
