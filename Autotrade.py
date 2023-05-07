@@ -227,6 +227,6 @@ while True:
             time.sleep(120)
     except Exception as e:
         print(e)
-        # post_message(myToken, "#coin_error", e)
+        post_message(myToken, "#coin_error", e)
         time.sleep(1)
 # get_balance()
