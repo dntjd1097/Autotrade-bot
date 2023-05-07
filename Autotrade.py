@@ -104,41 +104,41 @@ while True:
 
         start_time = get_start_time("KRW-BTC")
         end_time = start_time + timedelta(seconds=120)
-        current_price = get_current_price("KRW-BTC")
-        ma1 = get_moving_average(ticker, 1)
-        ma15 = get_moving_average(ticker, 15)
-        ma20 = get_moving_average(ticker, 20)
-        ma30 = get_moving_average(ticker, 30)
-        data = [
-                get_moving_average(ticker, 1),
-                get_moving_average(ticker, 15),
-                get_moving_average(ticker, 20),
-                get_moving_average(ticker, 30),
-            ]
-        min_target_price = min(data)
-        max_target_price = max(data)
-        check_buy = current_price  < min_target_price
-        check_sell = current_price > max_target_price
-        post_message(
-                myToken,
-                "#coin",
-                "*"
-                + coin
-                + "*\n *현재가* : "
-                + str(current_price)
-                + "\n 구매해야됨 :"
-                + str(check_buy)
-                + " ["
-                + str(min_target_price)
-                + "]"
-                + "\n 판매해야됨 :"
-                + str(check_sell)
-                + " ["
-                + str(max_target_price)
-                + "]",
-            )
+
         if start_time < now < end_time:
-            
+            current_price = get_current_price("KRW-BTC")
+            ma1 = get_moving_average(ticker, 1)
+            ma15 = get_moving_average(ticker, 15)
+            ma20 = get_moving_average(ticker, 20)
+            ma30 = get_moving_average(ticker, 30)
+            data = [
+                    get_moving_average(ticker, 1),
+                    get_moving_average(ticker, 15),
+                    get_moving_average(ticker, 20),
+                    get_moving_average(ticker, 30),
+                ]
+            min_target_price = min(data)
+            max_target_price = max(data)
+            check_buy = current_price  < min_target_price
+            check_sell = current_price > max_target_price
+            post_message(
+                    myToken,
+                    "#coin",
+                    "*"
+                    + coin
+                    + "*\n *현재가* : "
+                    + str(int(current_price))
+                    + "\n 구매해야됨 :"
+                    + str(check_buy)
+                    + " ["
+                    + str(int(min_target_price))
+                    + "]"
+                    + "\n 판매해야됨 :"
+                    + str(check_sell)
+                    + " ["
+                    + str(int(max_target_price))
+                    + "]",
+                )            
             # check1 = target_price > current_price
             # check2 = ma15 > current_price
             # check3 = "X"
