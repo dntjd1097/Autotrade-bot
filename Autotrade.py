@@ -117,7 +117,7 @@ while True:
             ]
         min_target_price = min(data)
         max_target_price = max(data)
-        check_buy = currnet_price < min_target_price
+        check_buy = current_price  < min_target_price
         check_sell = current_price > max_target_price
         post_message(
                 myToken,
