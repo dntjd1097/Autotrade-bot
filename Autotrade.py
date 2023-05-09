@@ -104,7 +104,7 @@ while True:
 
         start_time = get_start_time("KRW-BTC")
         end_time = start_time + timedelta(seconds=120)
-
+        get_balance()
         if start_time < now < end_time:
             current_price = get_current_price("KRW-BTC")
             ma1 = get_moving_average(ticker, 1)
