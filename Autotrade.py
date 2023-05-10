@@ -31,7 +31,10 @@ def get_balance():
             if a_ticker == "KRW":
                 krw = count
                 count = int(count)
-
+                get_balances_krw()
+                post_message(
+                    myToken, "#coin_balance", "\n=================================="
+                )
             else:
                 avg_buy_price = int(float(b["avg_buy_price"]))  # 매수 평균가
                 symbol = str("KRW-" + a_ticker)
@@ -44,6 +47,38 @@ def get_balance():
                     BTC_avg_buy_price = avg_buy_price
                     BTC_balance = count
                     BTC_current = current_price
+                post_message(
+                    myToken,
+                    "#coin_balance",
+                    "\n"
+                    + "*현재시간* :"
+                    + str(now)
+                    + "["
+                    + a_ticker
+                    + "]"
+                    + "\n*평가손익* :"
+                    + str(diff)
+                    + " KRW"
+                    + "    *수익률* :"
+                    + str(profit)
+                    + " %"
+                    + "\n*보유수량* : "
+                    + str(count)
+                    + " "
+                    + str(a_ticker)
+                    + "     \n*현재가격* : "
+                    + format(current_price, ",")
+                    + " KRW"
+                    + "     \n*매수평균가* : "
+                    + format(avg_buy_price, ",")
+                    + " KRW"
+                    + "\n*평가금액* : "
+                    + format(total_price, ",")
+                    + " KRW"
+                    + "     \n*매수금액* :"
+                    + format(sum, ",")
+                    + " KRW",
+                )
 
     return 0
 
@@ -52,37 +87,8 @@ def get_balances_krw():
     post_message(
         myToken,
         "#coin_balance",
-        "\n[" + "보유현금 : " + format(count, ",") + "KRW]",
+        "\n[" + "*보유현금* : " + format(count, ",") + "KRW]",
     )
-
-
-def get_balances_coin():
-    post_message(
-        myToken,
-        "#coin_balance",
-        "\n["
-        + a_ticker
-        + "]"
-        + "\n평가손익"
-        + str(diff)
-        + "    수익률 :"
-        + str(profit)
-        + " %"
-        + "\n보유수량 : "
-        + str(count)
-        + " "
-        + str(a_ticker)
-        + "     \n매수평균가 : "
-        + format(avg_buy_price, ",")
-        + " KRW"
-        + "\n평가금액 : "
-        + format(total_price, ",")
-        + " KRW"
-        + "     \n매수금액 :"
-        + format(sum, ",")
-        + " KRW",
-    )
-    post_message(myToken, "#coin_balance", "\n==================================")
 
 
 # 로그인
@@ -124,21 +130,23 @@ while True:
         post_message(
             myToken,
             "#coin",
-            "*"
+            "현재 시간 : "
+            + str(now)
             + coin
-            + "*\n *현재가* : "
+            + "\n *현재가* : "
             + str(int(current_price))
-            + "\n 구매해야됨 :"
+            + "\n *구매해야됨* :"
             + str(check_buy)
             + " ["
             + str(int(min_target_price))
             + "]"
-            + "\n 판매해야됨 :"
+            + "\n *판매해야됨* :"
             + str(check_sell)
             + " ["
             + str(int(max_target_price))
             + "]",
         )
+
         # check1 = target_price > current_price
         # check2 = ma15 > current_price
         # check3 = "X"
@@ -189,7 +197,7 @@ while True:
                 post_message(
                     myToken,
                     "#coin_test",
-                    "\n 구매시작 " + "\n==================================",
+                    "\n *구매시작* " + "\n==================================",
                 )
                 buy_result = upbit.buy_market_order(ticker, krw * 0.9995)
                 post_message(
@@ -212,9 +220,9 @@ while True:
                         "#coin_reward",
                         "현재시간 : "
                         + str(now)
-                        + "\n[보유현금 : "
+                        + "\n[*보유현금* : "
                         + format(krw, ",")
-                        + "krw ]"
+                        + "*krw* ]"
                         + "\n==================================",
                     )
                     get_balances_krw()
