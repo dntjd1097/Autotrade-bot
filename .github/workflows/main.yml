@@ -20,13 +20,3 @@ jobs:
         cd ~/wooseong/Autotrade-bot
         git pull
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Restart python
-      run: |
-        cd ~/wooseong/Autotrade-bot
-        bash clear.sh
-        nohup python3 Autotrade.py &  > upbit.log 
-        
-    - name : print log
-      run: |
-        cd ~/wooseong/Autotrade-bot
-        cat upbit.log
